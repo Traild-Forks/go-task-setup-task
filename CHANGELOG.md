@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v2.1.0 - 2026-05-17
+
 - Replaced `typed-rest-client` with `@actions/http-client` for GitHub API calls
   to eliminate the Node 24 `DEP0169` deprecation warning about `url.parse()`.
 - Modernized the TypeScript tooling stack (vitest, oxlint, `@actions/core@2`,
