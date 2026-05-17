@@ -259,6 +259,34 @@ tasks:
     cmds:
       - poetry install --no-root
 
+  release:
+    desc: "Tag and push a new release. Usage: task release VERSION=X.Y.Z"
+    vars:
+      MAJOR: '{{splitList "." .VERSION | first}}'
+      DATE: '{{dateInZone "2006-01-02" now "UTC"}}'
+    preconditions:
+      - sh: '[[ "{{.VERSION}}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]'
+        msg: 'VERSION must be X.Y.Z (no "v" prefix). Got: "{{.VERSION}}"'
+      - sh: '[[ -z "$(git status --porcelain)" ]]'
+        msg: "Working tree must be clean."
+      - sh: '[[ "$(git rev-parse --abbrev-ref HEAD)" == "main" ]]'
+        msg: "Must be on main branch."
+      - sh: 'git fetch origin main && [[ "$(git rev-parse HEAD)" == "$(git rev-parse origin/main)" ]]'
+        msg: "main must be up to date with origin/main."
+      - sh: 'grep -q "^## Unreleased$" CHANGELOG.md'
+        msg: 'CHANGELOG.md must contain an "## Unreleased" section.'
+      - sh: '! git rev-parse "v{{.VERSION}}" >/dev/null 2>&1'
+        msg: "Tag v{{.VERSION}} already exists."
+    cmds:
+      - node scripts/promote-changelog.mjs "{{.VERSION}}" "{{.DATE}}"
+      - git add CHANGELOG.md
+      - 'git commit -m "chore: release v{{.VERSION}}"'
+      - git tag "v{{.VERSION}}"
+      - git tag -f "v{{.MAJOR}}"
+      - git push origin main
+      - git push origin "v{{.VERSION}}"
+      - git push origin "v{{.MAJOR}}" --force
+
   ts:build:
     desc: Build the action's TypeScript code.
     deps:
