@@ -83,8 +83,24 @@ See [step-debug-logs](https://github.com/actions/toolkit/blob/master/docs/action
 
 ## Release workflow
 
-Instructions for releasing a new version of the action:
+To release a new version, run:
 
-1. If the release will increment the major version, update the action refs in the examples in README.md (e.g., `uses: go-task/setup-task@v1` -> `uses: go-task/setup-task@v2`).
-1. Create a [GitHub release](https://docs.github.com/en/github/administering-a-repository/managing-releases-in-a-repository#creating-a-release), following the `vX.Y.Z` tag name convention. Make sure to follow [the SemVer specification](https://semver.org/).
-1. Rebase the release branch for that major version (e.g., `v1` branch for the `v1.x.x` tags) on the tag. If no branch exists for the release's major version, create one.
+```
+task release VERSION=X.Y.Z
+```
+
+This will:
+
+1. Promote the `Unreleased` section of `CHANGELOG.md` to `vX.Y.Z`.
+1. Commit, tag (`vX.Y.Z`), and force-update the major version tag (`vX`).
+1. Push the commit and both tags to `origin`.
+1. Create a **draft** [GitHub release](https://docs.github.com/en/github/administering-a-repository/managing-releases-in-a-repository#creating-a-release) for `vX.Y.Z`, pre-filled with the corresponding `CHANGELOG.md` section as release notes.
+
+Before running, make sure to:
+
+- Update the action refs in `README.md` examples if incrementing major (e.g., `uses: go-task/setup-task@v1` -> `uses: go-task/setup-task@v2`).
+- Run `task check` and `task build` to ensure `dist/` is up to date.
+- Follow [the SemVer specification](https://semver.org/).
+- Have the [`gh` CLI](https://cli.github.com/) installed and authenticated.
+
+After the task completes, review the draft release on GitHub, edit the notes if needed, and publish it.
