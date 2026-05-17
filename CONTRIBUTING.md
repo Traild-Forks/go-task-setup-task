@@ -94,11 +94,13 @@ This will:
 1. Promote the `Unreleased` section of `CHANGELOG.md` to `vX.Y.Z`.
 1. Commit, tag (`vX.Y.Z`), and force-update the major version tag (`vX`).
 1. Push the commit and both tags to `origin`.
+1. Create a **draft** [GitHub release](https://docs.github.com/en/github/administering-a-repository/managing-releases-in-a-repository#creating-a-release) for `vX.Y.Z`, pre-filled with the corresponding `CHANGELOG.md` section as release notes.
 
 Before running, make sure to:
 
 - Update the action refs in `README.md` examples if incrementing major (e.g., `uses: go-task/setup-task@v1` -> `uses: go-task/setup-task@v2`).
 - Run `task check` and `task build` to ensure `dist/` is up to date.
 - Follow [the SemVer specification](https://semver.org/).
+- Have the [`gh` CLI](https://cli.github.com/) installed and authenticated.
 
-After the tag is pushed, create the [GitHub release](https://docs.github.com/en/github/administering-a-repository/managing-releases-in-a-repository#creating-a-release) from the `vX.Y.Z` tag, copying the relevant section from `CHANGELOG.md` into the release notes.
+After the task completes, review the draft release on GitHub, edit the notes if needed, and publish it.

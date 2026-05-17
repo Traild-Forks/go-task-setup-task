@@ -264,6 +264,8 @@ tasks:
     vars:
       MAJOR: '{{splitList "." .VERSION | first}}'
       DATE: '{{dateInZone "2006-01-02" now "UTC"}}'
+      RELEASE_NOTES_PATH:
+        sh: task utility:mktemp-file TEMPLATE="release-notes-XXXXXXXXXX.md"
     preconditions:
       - sh: '[[ "{{.VERSION}}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]'
         msg: 'VERSION must be X.Y.Z (no "v" prefix). Got: "{{.VERSION}}"'
@@ -277,6 +279,8 @@ tasks:
         msg: 'CHANGELOG.md must contain an "## Unreleased" section.'
       - sh: '! git rev-parse "v{{.VERSION}}" >/dev/null 2>&1'
         msg: "Tag v{{.VERSION}} already exists."
+      - sh: "command -v gh >/dev/null 2>&1"
+        msg: "gh CLI is required. Install: https://cli.github.com/"
     cmds:
       - node scripts/promote-changelog.mjs "{{.VERSION}}" "{{.DATE}}"
       - git add CHANGELOG.md
@@ -286,6 +290,8 @@ tasks:
       - git push origin main
       - git push origin "v{{.VERSION}}"
       - git push origin "v{{.MAJOR}}" --force
+      - node scripts/extract-changelog-section.mjs "{{.VERSION}}" > "{{.RELEASE_NOTES_PATH}}"
+      - gh release create "v{{.VERSION}}" --title "v{{.VERSION}}" --draft --notes-file "{{.RELEASE_NOTES_PATH}}"
 
   ts:build:
     desc: Build the action's TypeScript code.
