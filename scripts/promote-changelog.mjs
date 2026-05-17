@@ -14,9 +14,6 @@ if (!/^## Unreleased$/m.test(content)) {
   process.exit(1);
 }
 
-const updated = content.replace(
-  /^## Unreleased$/m,
-  `## Unreleased\n\n## v${version} - ${date}`,
-);
+const updated = content.replace(/^## Unreleased$/m, `## Unreleased\n\n## v${version} - ${date}`);
 
 writeFileSync(path, updated);
