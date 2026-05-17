@@ -265,7 +265,7 @@ tasks:
       MAJOR: '{{splitList "." .VERSION | first}}'
       DATE: '{{dateInZone "2006-01-02" now "UTC"}}'
       RELEASE_NOTES_PATH:
-        sh: task utility:mktemp-file TEMPLATE="release-notes-XXXXXXXXXX.md"
+        sh: task utility:mktemp-file TEMPLATE="release-notes.XXXXXXXXXX"
     preconditions:
       - sh: '[[ "{{.VERSION}}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]'
         msg: 'VERSION must be X.Y.Z (no "v" prefix). Got: "{{.VERSION}}"'
@@ -361,7 +361,7 @@ tasks:
   utility:mktemp-file:
     vars:
       RAW_PATH:
-        sh: mktemp --tmpdir "{{.TEMPLATE}}"
+        sh: mktemp "${TMPDIR:-/tmp}/{{.TEMPLATE}}"
     cmds:
       - task: utility:normalize-path
         vars:
@@ -372,7 +372,7 @@ tasks:
   utility:mktemp-folder:
     vars:
       RAW_PATH:
-        sh: mktemp --directory --tmpdir "{{.TEMPLATE}}"
+        sh: mktemp -d "${TMPDIR:-/tmp}/{{.TEMPLATE}}"
     cmds:
       - task: utility:normalize-path
         vars:
